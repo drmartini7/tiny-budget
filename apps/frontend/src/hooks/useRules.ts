@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { CreateRuleDto, Rule } from '@fun-budget/domain';
 
-const API_BASE = 'http://localhost:3000';
+const API_BASE = '/api';
 
 async function createRule(data: CreateRuleDto): Promise<Rule> {
   const response = await fetch(`${API_BASE}/rules`, {

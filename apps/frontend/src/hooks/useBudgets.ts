@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { BudgetWithDetails, CreateBudgetDto, Transaction, CreateTransactionDto } from '@fun-budget/domain';
 
-const API_BASE = 'http://localhost:3000';
+const API_BASE = '/api';
 
 async function fetchBudgets(includeDisabled = false): Promise<BudgetWithDetails[]> {
   // For now, we'll fetch all budgets. Later we can filter by owner

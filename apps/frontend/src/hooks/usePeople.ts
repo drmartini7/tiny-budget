@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Person, CreatePersonDto } from '@fun-budget/domain';
 
-const API_BASE = 'http://localhost:3000';
+const API_BASE = '/api';
 
 async function fetchPeople(): Promise<Person[]> {
   const response = await fetch(`${API_BASE}/people`);
