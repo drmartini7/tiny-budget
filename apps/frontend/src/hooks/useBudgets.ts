@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { BudgetWithDetails, CreateBudgetDto, Transaction, CreateTransactionDto } from '@fun-budget/domain';
+import { BudgetWithDetails, CreateBudgetDto, Transaction, CreateTransactionDto, UpdateBudgetDto, TransferFundsDto } from '@fun-budget/domain';
 
 const API_BASE = '/api';
 
@@ -59,6 +59,25 @@ async function setBudgetEnabled(id: string, enabled: boolean): Promise<BudgetWit
   });
   if (!response.ok) throw new Error('Failed to update budget');
   return response.json();
+}
+
+async function updateBudget({ id, data }: { id: string; data: UpdateBudgetDto }): Promise<BudgetWithDetails> {
+  const response = await fetch(`${API_BASE}/budgets/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Failed to update budget');
+  return response.json();
+}
+
+async function transferFunds(data: TransferFundsDto): Promise<void> {
+  const response = await fetch(`${API_BASE}/budgets/transfer`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Failed to transfer funds');
 }
 
 export function useBudgets(ownerId?: string, includeDisabled = false) {
@@ -122,6 +141,27 @@ export function useSetBudgetEnabled() {
     mutationFn: ({ id, enabled }: { id: string; enabled: boolean }) => setBudgetEnabled(id, enabled),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budgets'] });
+    },
+  });
+}
+
+export function useUpdateBudget() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateBudget,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budgets'] });
+    },
+  });
+}
+
+export function useTransferFunds() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: transferFunds,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budgets'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
     },
   });
 }

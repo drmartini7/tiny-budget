@@ -11,29 +11,32 @@ import {
 import { Switch } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateInput as MantineDateInput } from '@mantine/dates';
-import type { CreateBudgetDto, Person, PeriodType, OverflowPolicy } from '@fun-budget/domain';
+import type { CreateBudgetDto, UpdateBudgetDto, Person, PeriodType, OverflowPolicy, BudgetWithDetails } from '@fun-budget/domain';
 import { useTranslation } from 'react-i18next';
-import { useCreateBudget } from '../hooks/useBudgets';
+import { useCreateBudget, useUpdateBudget } from '../hooks/useBudgets';
 
 interface BudgetFormProps {
   people: Person[];
   onSubmit: () => void;
   onCancel: () => void;
+  initialData?: BudgetWithDetails;
 }
 
-export function BudgetForm({ people, onSubmit, onCancel }: BudgetFormProps) {
+export function BudgetForm({ people, onSubmit, onCancel, initialData }: BudgetFormProps) {
   const { t } = useTranslation();
   const createBudget = useCreateBudget();
+  const updateBudget = useUpdateBudget();
+  const isEditing = !!initialData;
 
   const form = useForm({
     initialValues: {
-      name: '',
-      ownerId: '',
-      currency: 'BRL',
-      periodType: 'MONTHLY',
-      overflowPolicy: 'NONE',
-      overflowLimit: 0,
-      startDate: new Date(),
+      name: initialData?.name || '',
+      ownerId: initialData?.ownerId || '',
+      currency: initialData?.currency || 'BRL',
+      periodType: initialData?.periodType || 'MONTHLY',
+      overflowPolicy: initialData?.overflowPolicy || 'NONE',
+      overflowLimit: initialData?.overflowLimit || 0,
+      startDate: initialData ? new Date(initialData.startDate) : new Date(),
       initialValue: 0,
       autoAddInPeriod: false,
       autoAddAmount: 0,
@@ -47,24 +50,36 @@ export function BudgetForm({ people, onSubmit, onCancel }: BudgetFormProps) {
 
   const handleSubmit = async (values: typeof form.values) => {
     try {
-      const budgetData: CreateBudgetDto = {
-        name: values.name,
-        ownerId: values.ownerId,
-        currency: values.currency,
-        periodType: values.periodType as unknown as PeriodType,
-        overflowPolicy: values.overflowPolicy as unknown as OverflowPolicy,
-        startDate: values.startDate,
-        enabled: true,
-        overflowLimit: values.overflowPolicy === 'LIMITED' ? values.overflowLimit : undefined,
-        initialValue: values.initialValue > 0 ? values.initialValue : undefined,
-        autoAddInPeriod: values.autoAddInPeriod,
-        autoAddAmount: values.autoAddInPeriod && values.autoAddAmount > 0 ? values.autoAddAmount : undefined,
-      };
-      
-      await createBudget.mutateAsync(budgetData);
+      if (isEditing && initialData) {
+        const updateData: UpdateBudgetDto = {
+          name: values.name,
+          ownerId: values.ownerId,
+          currency: values.currency,
+          periodType: values.periodType as unknown as PeriodType,
+          overflowPolicy: values.overflowPolicy as unknown as OverflowPolicy,
+          overflowLimit: values.overflowPolicy === 'LIMITED' ? values.overflowLimit : undefined,
+          enabled: initialData.enabled, // Preserve existing enabled state or add field to form
+        };
+        await updateBudget.mutateAsync({ id: initialData.id, data: updateData });
+      } else {
+        const budgetData: CreateBudgetDto = {
+          name: values.name,
+          ownerId: values.ownerId,
+          currency: values.currency,
+          periodType: values.periodType as unknown as PeriodType,
+          overflowPolicy: values.overflowPolicy as unknown as OverflowPolicy,
+          startDate: values.startDate,
+          enabled: true,
+          overflowLimit: values.overflowPolicy === 'LIMITED' ? values.overflowLimit : undefined,
+          initialValue: values.initialValue > 0 ? values.initialValue : undefined,
+          autoAddInPeriod: values.autoAddInPeriod,
+          autoAddAmount: values.autoAddInPeriod && values.autoAddAmount > 0 ? values.autoAddAmount : undefined,
+        };
+        await createBudget.mutateAsync(budgetData);
+      }
       onSubmit();
     } catch (error) {
-      console.error('Failed to create budget:', error);
+      console.error('Failed to save budget:', error);
     }
   };
 
@@ -89,7 +104,7 @@ export function BudgetForm({ people, onSubmit, onCancel }: BudgetFormProps) {
     <Card withBorder mb="md">
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="md">
-          <Text size="lg" fw={500}>{t('budget.createNew')}</Text>
+          <Text size="lg" fw={500}>{isEditing ? t('budget.edit') : t('budget.createNew')}</Text>
           
           <TextInput
             label={t('budget.name')}
@@ -166,8 +181,8 @@ export function BudgetForm({ people, onSubmit, onCancel }: BudgetFormProps) {
             <Button variant="outline" onClick={onCancel}>
               {t('common.cancel')}
             </Button>
-            <Button type="submit" loading={createBudget.isPending}>
-              {t('common.create')}
+            <Button type="submit" loading={createBudget.isPending || updateBudget.isPending}>
+              {isEditing ? t('common.save') : t('common.create')}
             </Button>
           </Group>
         </Stack>
