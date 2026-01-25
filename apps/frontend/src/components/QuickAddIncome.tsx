@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Modal, Button, TextInput, NumberInput, Stack, Group } from '@mantine/core';
+import { Modal, Button, TextInput, NumberInput, Stack, Group, ActionIcon, Tooltip } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
+import { IconPlus } from '@tabler/icons-react';
 import type { CreateTransactionDto, TransactionType } from '@fun-budget/domain';
 import { useTranslation } from 'react-i18next';
 import { useCreateTransaction } from '../hooks/useBudgets';
@@ -11,9 +12,10 @@ interface QuickAddIncomeProps {
   currency?: string;
   onAdded?: () => void;
   label?: string;
+  iconOnly?: boolean;
 }
 
-export function QuickAddIncome({ budgetId, onAdded, label }: QuickAddIncomeProps) {
+export function QuickAddIncome({ budgetId, onAdded, label, iconOnly }: QuickAddIncomeProps) {
   const { t } = useTranslation();
   const [opened, setOpened] = useState(false);
   const createTransaction = useCreateTransaction();
@@ -87,9 +89,23 @@ export function QuickAddIncome({ budgetId, onAdded, label }: QuickAddIncomeProps
         </form>
       </Modal>
 
-      <Button size="xs" variant="light" onClick={() => setOpened(true)}>
-        {label || t('income.addFunds')}
-      </Button>
+      {iconOnly ? (
+        <Tooltip label={label || t('income.addFunds')}>
+          <ActionIcon 
+            variant="light" 
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpened(true);
+            }}
+          >
+            <IconPlus size={16} />
+          </ActionIcon>
+        </Tooltip>
+      ) : (
+        <Button size="xs" variant="light" onClick={() => setOpened(true)}>
+          {label || t('income.addFunds')}
+        </Button>
+      )}
     </>
   );
 }

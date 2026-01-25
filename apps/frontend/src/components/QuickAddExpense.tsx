@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   Modal, 
   Button, 
@@ -26,6 +26,15 @@ export function QuickAddExpense({ budgets, onExpenseAdded }: QuickAddExpenseProp
   const { t } = useTranslation();
   const [opened, setOpened] = useState(false);
   const createTransaction = useCreateTransaction();
+  const budgetSelectRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (opened) {
+      setTimeout(() => {
+        budgetSelectRef.current?.focus();
+      }, 100);
+    }
+  }, [opened]);
 
   const form = useForm({
     initialValues: {
@@ -77,9 +86,12 @@ export function QuickAddExpense({ budgets, onExpenseAdded }: QuickAddExpenseProp
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap="md">
             <Select
+              ref={budgetSelectRef}
               label={t('expense.budget')}
               placeholder={t('expense.selectBudget')}
               data={budgetOptions}
+              searchable
+              nothingFoundMessage={t('budget.noBudgets')}
               {...form.getInputProps('budgetId')}
             />
             

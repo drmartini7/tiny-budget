@@ -91,13 +91,6 @@ function AppContent({ primaryColor, setPrimaryColor }: AppContentProps) {
                 {t('budget.createNew')}
               </Button>
             </Group>
-            <Group mb="md">
-              <Switch
-                label={t('budget.showDisabled')}
-                checked={showDisabledBudgets}
-                onChange={(event) => setShowDisabledBudgets(event.currentTarget.checked)}
-              />
-            </Group>
             
             {showBudgetForm && (
               <BudgetForm
