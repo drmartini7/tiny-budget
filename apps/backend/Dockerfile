@@ -22,6 +22,9 @@ RUN npm run -w @fun-budget/domain build && npm run -w backend build
 # Production stage
 FROM node:18-alpine AS production
 
+# Install system dependencies
+RUN apk add --no-cache openssl libc6-compat
+
 WORKDIR /app
 
 # Copy built application
