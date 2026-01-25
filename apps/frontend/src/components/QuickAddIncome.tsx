@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Modal, Button, TextInput, NumberInput, Stack, Group } from '@mantine/core';
+import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import type { CreateTransactionDto, TransactionType } from '@fun-budget/domain';
 import { useTranslation } from 'react-i18next';
@@ -63,6 +64,11 @@ export function QuickAddIncome({ budgetId, onAdded, label }: QuickAddIncomeProps
               min={0}
               step={0.01}
               {...form.getInputProps('amount')}
+            />
+            <DateInput
+              label={t('income.date')}
+              placeholder={t('income.datePlaceholder')}
+              {...form.getInputProps('date')}
             />
             <TextInput
               label={t('income.description')}
