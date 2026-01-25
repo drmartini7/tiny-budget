@@ -44,6 +44,19 @@ npm run dev -w apps/frontend
 ```
 Runs on `http://localhost:5173`.
 
+## Running with Docker
+
+1.  **Build and Start**:
+    ```bash
+    docker-compose up -d --build
+    ```
+
+2.  **Access**:
+    *   Frontend: `http://localhost:80`
+    *   Backend: `http://localhost:3000`
+
+For detailed deployment instructions, including Proxmox setup and backups, see [DEPLOYMENT.md](DEPLOYMENT.md).
+
 ## Features
 
 - Multi-user and multi-budget support.
