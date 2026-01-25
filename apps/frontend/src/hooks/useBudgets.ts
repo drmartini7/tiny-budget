@@ -36,6 +36,13 @@ async function createTransaction(data: CreateTransactionDto): Promise<Transactio
   return response.json();
 }
 
+async function deleteTransaction({ budgetId, transactionId }: { budgetId: string; transactionId: string }): Promise<void> {
+  const response = await fetch(`${API_BASE}/budgets/${budgetId}/transactions/${transactionId}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) throw new Error('Failed to delete transaction');
+}
+
 async function executeRules(budgetId: string): Promise<any> {
   const response = await fetch(`${API_BASE}/budgets/${budgetId}/execute-rules`, {
     method: 'POST',
@@ -77,6 +84,18 @@ export function useCreateTransaction() {
   
   return useMutation({
     mutationFn: createTransaction,
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['budgets'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions', variables.budgetId] });
+    },
+  });
+}
+
+export function useDeleteTransaction() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: deleteTransaction,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['budgets'] });
       queryClient.invalidateQueries({ queryKey: ['transactions', variables.budgetId] });

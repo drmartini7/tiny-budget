@@ -10,6 +10,7 @@ import {
   ActionIcon,
   Tooltip
 } from '@mantine/core';
+import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { IconPlus, IconCurrencyDollar } from '@tabler/icons-react';
 import type { Budget, CreateTransactionDto, TransactionType } from '@fun-budget/domain';
@@ -89,6 +90,12 @@ export function QuickAddExpense({ budgets, onExpenseAdded }: QuickAddExpenseProp
               {...form.getInputProps('amount')}
             />
             
+            <DateInput
+              label={t('expense.date')}
+              placeholder={t('expense.datePlaceholder')}
+              {...form.getInputProps('date')}
+            />
+
             <TextInput
               label={t('expense.description')}
               placeholder={t('expense.descriptionPlaceholder')}

@@ -232,6 +232,20 @@ export class BudgetService {
     return this.toDomainTransaction(t);
   }
 
+  async deleteTransaction(budgetId: string, transactionId: string): Promise<void> {
+    const transaction = await this.prisma.transaction.findFirst({
+      where: { id: transactionId, budgetId },
+    });
+
+    if (!transaction) {
+      throw new NotFoundException('Transaction not found');
+    }
+
+    await this.prisma.transaction.delete({
+      where: { id: transactionId },
+    });
+  }
+
   async getTransactions(budgetId: string, limit = 50): Promise<Transaction[]> {
     const list = await this.prisma.transaction.findMany({
       where: { budgetId },

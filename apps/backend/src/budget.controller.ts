@@ -51,6 +51,14 @@ export class BudgetController {
     });
   }
 
+  @Delete(':id/transactions/:transactionId')
+  async deleteTransaction(
+    @Param('id') budgetId: string,
+    @Param('transactionId') transactionId: string,
+  ): Promise<void> {
+    return this.budgetService.deleteTransaction(budgetId, transactionId);
+  }
+
   @Get(':id/transactions')
   async getTransactions(@Param('id') budgetId: string): Promise<Transaction[]> {
     return this.budgetService.getTransactions(budgetId);

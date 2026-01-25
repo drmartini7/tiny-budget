@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { Card, Group, Text, Stack, Select, Badge, ScrollArea } from '@mantine/core';
+import { Card, Group, Text, Stack, Select, Badge, ScrollArea, ActionIcon } from '@mantine/core';
+import { IconTrash } from '@tabler/icons-react';
 import type { BudgetWithDetails } from '@fun-budget/domain';
 import { useTranslation } from 'react-i18next';
 import { useTransactions } from '../hooks/useTransactions';
+import { useDeleteTransaction } from '../hooks/useBudgets';
 
 interface TransactionListProps {
   budgets: BudgetWithDetails[];
@@ -13,6 +15,7 @@ export function TransactionList({ budgets }: TransactionListProps) {
   const [selectedBudgetId, setSelectedBudgetId] = useState<string>('');
   
   const { data: transactions = [] } = useTransactions(selectedBudgetId);
+  const deleteTransaction = useDeleteTransaction();
 
   const budgetOptions = budgets.map(budget => ({
     value: budget.id,
@@ -76,12 +79,22 @@ export function TransactionList({ budgets }: TransactionListProps) {
                           </Stack>
                           
                           <Stack gap={0} align="end">
-                            <Badge 
-                              color={getTransactionTypeColor(transaction.amount)}
-                              variant="light"
-                            >
-                              {getTransactionTypeLabel(transaction.amount)}
-                            </Badge>
+                            <Group gap="xs">
+                              <Badge 
+                                color={getTransactionTypeColor(transaction.amount)}
+                                variant="light"
+                              >
+                                {getTransactionTypeLabel(transaction.amount)}
+                              </Badge>
+                              <ActionIcon 
+                                color="red" 
+                                variant="subtle" 
+                                onClick={() => deleteTransaction.mutate({ budgetId: selectedBudgetId, transactionId: transaction.id })}
+                                loading={deleteTransaction.isPending}
+                              >
+                                <IconTrash size={16} />
+                              </ActionIcon>
+                            </Group>
                             <Text 
                               size="lg" 
                               fw={600}

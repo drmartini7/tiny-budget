@@ -7,6 +7,7 @@ import App from './App';
 // Import styles of packages that you've installed.
 // All packages except `@mantine/hooks` require styles imports
 import '@mantine/core/styles.css';
+import '@mantine/dates/styles.css';
 
 const queryClient = new QueryClient();
 
