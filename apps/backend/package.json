@@ -8,9 +8,9 @@
     "dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "migrate:prod": "prisma migrate deploy"
+    "prisma:generate": "node -e \"process.env.DATABASE_URL = process.env.DATABASE_URL || 'file:./dev.db'; require('child_process').spawnSync('npx', ['prisma', 'generate'], { stdio: 'inherit', shell: true });\"",
+    "prisma:migrate": "node -e \"process.env.DATABASE_URL = process.env.DATABASE_URL || 'file:./dev.db'; require('child_process').spawnSync('npx', ['prisma', 'migrate', 'dev'], { stdio: 'inherit', shell: true });\"",
+    "migrate:prod": "node -e \"process.env.DATABASE_URL = process.env.DATABASE_URL || 'file:./dev.db'; require('child_process').spawnSync('npx', ['prisma', 'migrate', 'deploy'], { stdio: 'inherit', shell: true });\""
   },
   "dependencies": {
     "@fun-budget/domain": "*",

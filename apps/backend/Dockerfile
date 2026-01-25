@@ -1,5 +1,8 @@
 FROM node:18-alpine AS builder
 
+# Install system dependencies
+RUN apk add --no-cache openssl libc6-compat
+
 WORKDIR /app
 
 # Copy package files
@@ -12,6 +15,9 @@ RUN npm ci --workspaces --include-workspace-root
 
 # Copy source code
 COPY . .
+
+# Prisma database location (required by schema.prisma)
+ENV DATABASE_URL=file:/app/data/dev.db
 
 # Generate Prisma client
 RUN npx prisma generate --schema=apps/backend/prisma/schema.prisma
@@ -26,6 +32,9 @@ FROM node:18-alpine AS production
 RUN apk add --no-cache openssl libc6-compat
 
 WORKDIR /app
+
+# Prisma database location (required by schema.prisma)
+ENV DATABASE_URL=file:/app/data/dev.db
 
 # Copy built application
 COPY --from=builder /app/apps/backend/dist ./dist
