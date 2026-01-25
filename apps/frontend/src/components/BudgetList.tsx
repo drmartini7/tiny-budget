@@ -1,19 +1,26 @@
-import { Card, Group, Text, Badge, Stack, Grid, Button } from '@mantine/core';
+import { useState } from 'react';
+import { Card, Group, Text, Badge, Stack, Grid, Button, Modal, ActionIcon, Tooltip } from '@mantine/core';
+import { IconEdit, IconArrowsRightLeft } from '@tabler/icons-react';
 import { BudgetWithDetails } from '@fun-budget/domain';
 import { useTranslation } from 'react-i18next';
 import { QuickAddIncome } from './QuickAddIncome';
 import { useSetBudgetEnabled } from '../hooks/useBudgets';
+import { BudgetForm } from './BudgetForm';
+import { TransferModal } from './TransferModal';
 
 interface BudgetListProps {
   budgets: BudgetWithDetails[];
   selectedBudget: BudgetWithDetails | null;
   onBudgetSelect: (budget: BudgetWithDetails | null) => void;
   onBudgetUpdated?: () => void;
+  people?: any[]; // Need people for BudgetForm
 }
 
-export function BudgetList({ budgets, selectedBudget, onBudgetSelect, onBudgetUpdated }: BudgetListProps) {
+export function BudgetList({ budgets, selectedBudget, onBudgetSelect, onBudgetUpdated, people = [] }: BudgetListProps) {
   const { t } = useTranslation();
   const setEnabled = useSetBudgetEnabled();
+  const [editingBudget, setEditingBudget] = useState<BudgetWithDetails | null>(null);
+  const [transferSourceBudget, setTransferSourceBudget] = useState<BudgetWithDetails | null>(null);
 
   const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat('en-US', {
@@ -34,6 +41,32 @@ export function BudgetList({ budgets, selectedBudget, onBudgetSelect, onBudgetUp
 
   return (
     <Stack gap="md">
+      <Modal 
+        opened={!!editingBudget} 
+        onClose={() => setEditingBudget(null)} 
+        title={t('budget.edit')}
+        size="lg"
+      >
+        {editingBudget && (
+          <BudgetForm
+            people={people}
+            onSubmit={() => {
+              setEditingBudget(null);
+              onBudgetUpdated?.();
+            }}
+            onCancel={() => setEditingBudget(null)}
+            initialData={editingBudget}
+          />
+        )}
+      </Modal>
+
+      <TransferModal
+        opened={!!transferSourceBudget}
+        onClose={() => setTransferSourceBudget(null)}
+        budgets={budgets}
+        sourceBudgetId={transferSourceBudget?.id}
+      />
+
       {budgets.length === 0 ? (
         <Card withBorder>
           <Text c="dimmed" ta="center">
@@ -59,7 +92,21 @@ export function BudgetList({ budgets, selectedBudget, onBudgetSelect, onBudgetUp
                 >
                   <Stack gap="xs">
                     <Group justify="apart">
-                      <Text fw={500}>{budget.name}</Text>
+                      <Group gap="xs">
+                        <Text fw={500}>{budget.name}</Text>
+                        <Tooltip label={t('common.edit')}>
+                          <ActionIcon 
+                            variant="subtle" 
+                            size="sm" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingBudget(budget);
+                            }}
+                          >
+                            <IconEdit size={16} />
+                          </ActionIcon>
+                        </Tooltip>
+                      </Group>
                       <Badge color={status.color} variant="light">
                         {status.label}
                       </Badge>
@@ -109,6 +156,18 @@ export function BudgetList({ budgets, selectedBudget, onBudgetSelect, onBudgetUp
                         onAdded={onBudgetUpdated}
                         label={t('income.addFunds')}
                       />
+                      <Tooltip label={t('budget.transferFunds')}>
+                        <ActionIcon 
+                          variant="light" 
+                          color="blue" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setTransferSourceBudget(budget);
+                          }}
+                        >
+                          <IconArrowsRightLeft size={16} />
+                        </ActionIcon>
+                      </Tooltip>
                     </Group>
                   </Stack>
                 </Card>

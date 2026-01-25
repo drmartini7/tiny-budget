@@ -56,6 +56,11 @@ function AppContent({ primaryColor, setPrimaryColor }: AppContentProps) {
       <Group justify="apart" mb="md">
         <Title order={1}>{t('app.title')}</Title>
         <Group>
+          <Switch
+            label={t('budget.showDisabled')}
+            checked={showDisabledBudgets}
+            onChange={(event) => setShowDisabledBudgets(event.currentTarget.checked)}
+          />
           <QuickAddExpense budgets={budgets} onExpenseAdded={handleExpenseAdded} />
           <ActionIcon variant="light" size="lg" onClick={() => setSettingsOpened(true)}>
             <IconSettings size="1.2rem" />
@@ -104,6 +109,7 @@ function AppContent({ primaryColor, setPrimaryColor }: AppContentProps) {
             
             <BudgetList
               budgets={budgets}
+              people={people}
               onBudgetSelect={setSelectedBudget}
               selectedBudget={selectedBudget}
               onBudgetUpdated={refetchBudgets}

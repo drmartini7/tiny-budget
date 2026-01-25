@@ -4,6 +4,8 @@ import { RulesService } from './rules.service';
 import { 
   CreateBudgetDto, 
   CreateTransactionDto, 
+  UpdateBudgetDto,
+  TransferFundsDto,
   BudgetWithDetails, 
   Transaction,
   RuleExecutionResult 
@@ -20,6 +22,20 @@ export class BudgetController {
   async createBudget(@Body() data: CreateBudgetDto): Promise<BudgetWithDetails> {
     const budget = await this.budgetService.createBudget(data);
     return this.budgetService.getBudgetById(budget.id);
+  }
+
+  @Put(':id')
+  async updateBudget(
+    @Param('id') id: string,
+    @Body() data: UpdateBudgetDto
+  ): Promise<BudgetWithDetails> {
+    const budget = await this.budgetService.updateBudget(id, data);
+    return this.budgetService.getBudgetById(budget.id);
+  }
+
+  @Post('transfer')
+  async transferFunds(@Body() data: TransferFundsDto): Promise<void> {
+    return this.budgetService.transferFunds(data);
   }
 
   @Get()

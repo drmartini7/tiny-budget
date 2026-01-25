@@ -28,6 +28,7 @@ const resources = {
       budget: {
         title: 'Budgets',
         createNew: 'Create New Budget',
+        edit: 'Edit Budget',
         name: 'Name',
         namePlaceholder: 'Enter budget name',
         owner: 'Owner',
@@ -53,6 +54,8 @@ const resources = {
         autoAddAmount: 'Auto add amount',
         autoAddAmountPlaceholder: 'Enter amount to auto add',
         noBudgets: 'No budgets found. Create your first budget!',
+        transferFunds: 'Transfer Funds',
+        selectBudget: 'Select budget',
         status: {
           available: 'Available',
           empty: 'Empty',
@@ -126,10 +129,21 @@ const resources = {
         limited: 'Limited',
         unlimited: 'Unlimited',
       },
+      transfer: {
+        title: 'Transfer Funds',
+        from: 'From Budget',
+        to: 'To Budget',
+        amount: 'Amount',
+        date: 'Date',
+        description: 'Description',
+        descriptionPlaceholder: 'Reason for transfer',
+      },
       validation: {
         required: 'This field is required',
         amountPositive: 'Amount must be positive',
         invalidEmail: 'Invalid email address',
+        minOne: 'Must be at least 1',
+        sameBudget: 'Cannot transfer to the same budget',
       },
       settings: {
         title: 'Settings',
@@ -172,6 +186,7 @@ const resources = {
       budget: {
         title: 'Orçamentos',
         createNew: 'Criar Novo Orçamento',
+        edit: 'Editar Orçamento',
         name: 'Nome',
         namePlaceholder: 'Digite o nome do orçamento',
         owner: 'Proprietário',
@@ -197,6 +212,8 @@ const resources = {
         autoAddAmount: 'Valor para adicionar automaticamente',
         autoAddAmountPlaceholder: 'Digite o valor para adicionar automaticamente',
         noBudgets: 'Nenhum orçamento encontrado. Crie seu primeiro orçamento!',
+        transferFunds: 'Transferir Fundos',
+        selectBudget: 'Selecione o orçamento',
         status: {
           available: 'Disponível',
           empty: 'Vazio',
@@ -270,10 +287,21 @@ const resources = {
         limited: 'Limitado',
         unlimited: 'Ilimitado',
       },
+      transfer: {
+        title: 'Transferir Fundos',
+        from: 'Do Orçamento',
+        to: 'Para o Orçamento',
+        amount: 'Valor',
+        date: 'Data',
+        description: 'Descrição',
+        descriptionPlaceholder: 'Motivo da transferência',
+      },
       validation: {
         required: 'Este campo é obrigatório',
         amountPositive: 'O valor deve ser positivo',
         invalidEmail: 'Endereço de email inválido',
+        minOne: 'Deve ser pelo menos 1',
+        sameBudget: 'Não é possível transferir para o mesmo orçamento',
       },
       settings: {
         title: 'Configurações',

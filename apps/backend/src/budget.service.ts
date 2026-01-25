@@ -10,6 +10,8 @@ import {
   BudgetWithDetails,
   CreateBudgetDto,
   CreateTransactionDto,
+  UpdateBudgetDto,
+  TransferFundsDto,
   PeriodType
 } from '@fun-budget/domain';
 import { startOfDay, endOfDay, startOfMonth, endOfMonth, startOfYear, endOfYear, isWithinInterval, addMonths } from 'date-fns';
@@ -120,6 +122,57 @@ export class BudgetService {
     }
 
     return this.toDomainBudget(budget);
+  }
+
+  async updateBudget(id: string, data: UpdateBudgetDto): Promise<Budget> {
+    const b = await this.prisma.budget.update({
+      where: { id },
+      data: {
+        name: data.name,
+        ownerId: data.ownerId,
+        currency: data.currency,
+        periodType: data.periodType as string,
+        overflowPolicy: data.overflowPolicy as string,
+        overflowLimit: data.overflowPolicy === 'LIMITED' ? data.overflowLimit : undefined,
+        enabled: data.enabled,
+      },
+    });
+    return this.toDomainBudget(b);
+  }
+
+  async transferFunds(data: TransferFundsDto): Promise<void> {
+    const fromBudget = await this.prisma.budget.findUnique({ where: { id: data.fromBudgetId } });
+    const toBudget = await this.prisma.budget.findUnique({ where: { id: data.toBudgetId } });
+
+    if (!fromBudget || !toBudget) {
+      throw new NotFoundException('Source or target budget not found');
+    }
+
+    const fromPeriod = await this.getCurrentPeriod(data.fromBudgetId);
+    const toPeriod = await this.getCurrentPeriod(data.toBudgetId);
+
+    await this.prisma.$transaction([
+      this.prisma.transaction.create({
+        data: {
+          budgetId: data.fromBudgetId,
+          periodId: fromPeriod?.id,
+          amount: -data.amount,
+          date: new Date(data.date || new Date()),
+          description: data.description || `Transfer to ${toBudget.name}`,
+          type: TransactionType.EXPENSE,
+        },
+      }),
+      this.prisma.transaction.create({
+        data: {
+          budgetId: data.toBudgetId,
+          periodId: toPeriod?.id,
+          amount: data.amount,
+          date: new Date(data.date || new Date()),
+          description: data.description || `Transfer from ${fromBudget.name}`,
+          type: TransactionType.INCOME,
+        },
+      }),
+    ]);
   }
 
   async getBudgetsByOwner(ownerId: string, includeDisabled = false): Promise<BudgetWithDetails[]> {
