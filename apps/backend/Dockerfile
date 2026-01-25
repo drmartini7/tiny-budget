@@ -8,7 +8,7 @@ COPY apps/backend/package*.json ./apps/backend/
 COPY packages/domain/package*.json ./packages/domain/
 
 # Install dependencies
-RUN npm ci
+RUN npm ci --workspaces --include-workspace-root
 
 # Copy source code
 COPY . .
@@ -17,7 +17,7 @@ COPY . .
 RUN npx prisma generate --schema=apps/backend/prisma/schema.prisma
 
 # Build the application
-RUN npm run build
+RUN npm run -w @fun-budget/domain build && npm run -w backend build
 
 # Production stage
 FROM node:18-alpine AS production
