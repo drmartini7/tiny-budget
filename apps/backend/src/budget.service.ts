@@ -12,7 +12,7 @@ import {
   CreateTransactionDto,
   PeriodType
 } from '@fun-budget/domain';
-import { startOfDay, endOfDay, startOfMonth, endOfMonth, startOfYear, endOfYear, isWithinInterval } from 'date-fns';
+import { startOfDay, endOfDay, startOfMonth, endOfMonth, startOfYear, endOfYear, isWithinInterval, addMonths } from 'date-fns';
 
 @Injectable()
 export class BudgetService {
@@ -222,9 +222,47 @@ export class BudgetService {
     // Get current period for this budget
     const currentPeriod = await this.getCurrentPeriod(data.budgetId);
     
+    if (data.installments && data.installments > 1) {
+      const amountPerInstallment = data.amount / data.installments;
+      const transactions = [];
+      const baseDate = new Date(data.date);
+
+      for (let i = 0; i < data.installments; i++) {
+        const date = addMonths(baseDate, i);
+        let periodId = undefined;
+        
+        // Only assign period if it falls within the current open period
+        if (currentPeriod && isWithinInterval(date, { start: currentPeriod.startDate, end: currentPeriod.endDate })) {
+          periodId = currentPeriod.id;
+        }
+
+        // We can't batch create easily with different data unless we use createMany which doesn't return created items easily in all DBs or just loop.
+        // Prisma $transaction allows sequential creates.
+        transactions.push(
+          this.prisma.transaction.create({
+            data: {
+              budgetId: data.budgetId,
+              periodId,
+              amount: amountPerInstallment,
+              date,
+              description: `${data.description} (${i + 1}/${data.installments})`,
+              type: data.type,
+              merchant: data.merchant,
+            },
+          })
+        );
+      }
+
+      const results = await this.prisma.$transaction(transactions);
+      return this.toDomainTransaction(results[0]);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { installments, ...transactionData } = data;
+
     const t = await this.prisma.transaction.create({
       data: {
-        ...data,
+        ...transactionData,
         periodId: currentPeriod?.id,
         date: new Date(data.date),
       },
@@ -257,7 +295,10 @@ export class BudgetService {
 
   async calculateCurrentBalance(budgetId: string): Promise<number> {
     const transactions = await this.prisma.transaction.findMany({
-      where: { budgetId },
+      where: { 
+        budgetId,
+        date: { lte: new Date() } 
+      },
     });
 
     return transactions.reduce((sum, transaction) => sum + transaction.amount, 0);
