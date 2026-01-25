@@ -41,4 +41,4 @@ RUN mkdir -p /app/data
 EXPOSE 3000
 
 # Start the application
-CMD ["node", "dist/main"]
+CMD ["/bin/sh", "-c", "npx prisma migrate deploy --schema=./prisma/schema.prisma && node dist/main"]
