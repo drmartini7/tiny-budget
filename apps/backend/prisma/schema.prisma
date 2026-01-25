@@ -1,0 +1,90 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Person {
+  id        String   @id @default(uuid())
+  name      String
+  email     String?
+  budgets   Budget[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+}
+
+model Budget {
+  id             String         @id @default(uuid())
+  name           String
+  owner          Person         @relation(fields: [ownerId], references: [id])
+  ownerId        String
+  currency       String         @default("USD")
+  periodType     String         // DAILY | MONTHLY | YEARLY
+  overflowPolicy String         // NONE | LIMITED | UNLIMITED
+  overflowLimit  Float?
+  startDate      DateTime
+  enabled        Boolean        @default(true)
+  transactions   Transaction[]
+  periods        BudgetPeriod[]
+  rules          Rule[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([ownerId])
+  @@index([periodType])
+  @@index([enabled])
+}
+
+model BudgetPeriod {
+  id        String   @id @default(uuid())
+  budget    Budget   @relation(fields: [budgetId], references: [id])
+  budgetId  String
+  startDate DateTime
+  endDate   DateTime
+  status    String   // OPEN | CLOSED
+
+  transactions Transaction[]
+
+  @@unique([budgetId, startDate, endDate])
+  @@index([budgetId, status])
+}
+
+model Transaction {
+  id           String   @id @default(uuid())
+  budget       Budget   @relation(fields: [budgetId], references: [id])
+  budgetId     String
+  period       BudgetPeriod? @relation(fields: [periodId], references: [id])
+  periodId     String?
+  amount       Float
+  date         DateTime
+  description  String
+  merchant     String?
+  type         String   // EXPENSE | INCOME | CARRYOVER | RECURRING_RULE
+  sourceRuleId String?
+  createdAt    DateTime @default(now())
+
+  @@index([budgetId, date])
+  @@index([periodId])
+  @@index([sourceRuleId])
+}
+
+model Rule {
+  id           String    @id @default(uuid())
+  budget       Budget    @relation(fields: [budgetId], references: [id])
+  budgetId     String
+  amount       Float
+  frequency    String    // DAILY | MONTHLY | YEARLY
+  executionDay Int
+  startDate    DateTime
+  endDate      DateTime?
+  description  String
+  lastExecutedAt DateTime?
+
+  @@unique([budgetId, frequency, executionDay, startDate])
+  @@index([budgetId])
+}
