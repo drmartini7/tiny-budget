@@ -24,7 +24,7 @@ Fun Budget is a lightweight family budgeting application designed for easy self-
 
 2. **Build and start the application**
    ```bash
-   docker-compose up -d
+   docker-compose up -d --build
    ```
 
 3. **Access the application**
@@ -38,18 +38,23 @@ Fun Budget is a lightweight family budgeting application designed for easy self-
    npm install
    ```
 
-2. **Set up the database**
-   ```bash
-   cd apps/backend
-   npx prisma migrate dev
+2. **Configure Environment**
+   Create a `.env` file in `apps/backend/` (optional, defaults to local SQLite):
+   ```env
+   DATABASE_URL="file:./dev.db"
    ```
 
-3. **Build the application**
+3. **Set up the database**
    ```bash
-   npm run build
+   npm run prisma:migrate -w apps/backend
    ```
 
-4. **Start the services**
+4. **Build the application**
+   ```bash
+   npm run build --workspaces
+   ```
+
+5. **Start the services**
    ```bash
    # Terminal 1: Backend
    cd apps/backend && npm start
@@ -174,9 +179,11 @@ tail -f apps/backend/logs/*.log
    ```
 
 ### Database Migrations
+For Docker deployments, migrations run automatically on container startup.
+
+For manual updates:
 ```bash
-cd apps/backend
-npx prisma migrate deploy
+npm run migrate:prod -w apps/backend
 ```
 
 ## Support
