@@ -41,4 +41,4 @@ RUN mkdir -p /app/data
 EXPOSE 3000
 
 # Start the application
-CMD ["/bin/sh", "-c", "DATABASE_URL=file:/app/data/dev.db npx prisma migrate deploy --schema=./prisma/schema.prisma && node dist/main"]
+CMD ["/bin/sh", "-c", "export DATABASE_URL=file:/app/data/dev.db && npx prisma migrate deploy --schema=./prisma/schema.prisma && node dist/main"]
