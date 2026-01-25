@@ -102,7 +102,9 @@ export const CreateBudgetSchema = BudgetSchema.omit({ id: true, createdAt: true,
 });
 export type CreateBudgetDto = z.infer<typeof CreateBudgetSchema>;
 
-export const CreateTransactionSchema = TransactionSchema.omit({ id: true, createdAt: true, periodId: true });
+export const CreateTransactionSchema = TransactionSchema.omit({ id: true, createdAt: true, periodId: true }).extend({
+  installments: z.number().min(1).optional(),
+});
 export type CreateTransactionDto = z.infer<typeof CreateTransactionSchema>;
 
 export const CreatePersonSchema = PersonSchema.omit({ id: true, createdAt: true, updatedAt: true });

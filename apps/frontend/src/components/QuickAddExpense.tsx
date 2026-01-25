@@ -34,11 +34,13 @@ export function QuickAddExpense({ budgets, onExpenseAdded }: QuickAddExpenseProp
       description: '',
       merchant: '',
       date: new Date(),
+      installments: 1,
     },
     validate: {
       budgetId: (value) => (value ? null : t('validation.required')),
       amount: (value) => (value > 0 ? null : t('validation.amountPositive')),
       description: (value) => (value.trim().length > 0 ? null : t('validation.required')),
+      installments: (value) => (value >= 1 ? null : t('validation.minOne')),
     },
   });
 
@@ -88,6 +90,13 @@ export function QuickAddExpense({ budgets, onExpenseAdded }: QuickAddExpenseProp
               step={0.01}
               leftSection={<IconCurrencyDollar size={16} />}
               {...form.getInputProps('amount')}
+            />
+
+            <NumberInput
+              label={t('expense.installments')}
+              placeholder="1"
+              min={1}
+              {...form.getInputProps('installments')}
             />
             
             <DateInput
