@@ -23,7 +23,7 @@ export function PersonList({ people }: PersonListProps) {
           {people.map((person) => (
             <Card key={person.id} withBorder>
               <Group>
-                <Avatar color="blue" radius="xl">
+                <Avatar radius="xl">
                   <IconUser size={18} />
                 </Avatar>
                 <Stack gap={0}>

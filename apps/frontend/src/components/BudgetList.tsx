@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, Group, Text, Badge, Stack, Grid, Button, Modal, ActionIcon, Tooltip } from '@mantine/core';
+import { Card, Group, Text, Badge, Stack, Grid, Modal, ActionIcon, Tooltip, Switch } from '@mantine/core';
 import { IconEdit, IconArrowsRightLeft } from '@tabler/icons-react';
 import { BudgetWithDetails } from '@fun-budget/domain';
 import { useTranslation } from 'react-i18next';
@@ -137,37 +137,40 @@ export function BudgetList({ budgets, selectedBudget, onBudgetSelect, onBudgetUp
                     </Group>
 
                     <Group justify="apart" mt="sm">
-                      <Text size="xs" c="dimmed">
-                        {budget.enabled ? t('budget.enabled') : t('budget.disabled')}
-                      </Text>
-                      <Button
-                        size="xs"
-                        variant="outline"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEnabled.mutate({ id: budget.id, enabled: !budget.enabled });
-                        }}
-                      >
-                        {budget.enabled ? t('budget.disable') : t('budget.enable')}
-                      </Button>
-                      <QuickAddIncome
-                        budgetId={budget.id}
-                        currency={budget.currency}
-                        onAdded={onBudgetUpdated}
-                        label={t('income.addFunds')}
-                      />
-                      <Tooltip label={t('budget.transferFunds')}>
-                        <ActionIcon 
-                          variant="light" 
-                          color="blue" 
-                          onClick={(e) => {
+                      <Group gap="xs">
+                        <Switch
+                          size="md"
+                          onLabel={t('budget.enabled')}
+                          offLabel={t('budget.disabled')}
+                          checked={budget.enabled}
+                          onChange={(e) => {
                             e.stopPropagation();
-                            setTransferSourceBudget(budget);
+                            setEnabled.mutate({ id: budget.id, enabled: e.currentTarget.checked });
                           }}
-                        >
-                          <IconArrowsRightLeft size={16} />
-                        </ActionIcon>
-                      </Tooltip>
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      </Group>
+                      
+                      <Group gap="xs">
+                        <QuickAddIncome
+                          budgetId={budget.id}
+                          currency={budget.currency}
+                          onAdded={onBudgetUpdated}
+                          label={t('income.addFunds')}
+                          iconOnly
+                        />
+                        <Tooltip label={t('budget.transferFunds')}>
+                          <ActionIcon 
+                            variant="light"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setTransferSourceBudget(budget);
+                            }}
+                          >
+                            <IconArrowsRightLeft size={16} />
+                          </ActionIcon>
+                        </Tooltip>
+                      </Group>
                     </Group>
                   </Stack>
                 </Card>
