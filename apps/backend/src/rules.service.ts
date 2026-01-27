@@ -20,7 +20,8 @@ export class RulesService {
       budgetId: r.budgetId,
       amount: r.amount,
       frequency: r.frequency as any,
-      executionDay: r.executionDay,
+      executionDay: r.executionDay ?? undefined,
+      runOnPeriodReset: r.runOnPeriodReset,
       startDate: r.startDate,
       endDate: r.endDate ?? undefined,
       description: r.description,
@@ -82,6 +83,41 @@ export class RulesService {
     }
 
     return results;
+  }
+
+  async executeRulesOnPeriodReset(budgetId: string, newPeriodId: string): Promise<void> {
+    const rules = await this.prisma.rule.findMany({
+      where: { 
+        budgetId,
+        runOnPeriodReset: true,
+      },
+    });
+
+    const now = new Date();
+
+    for (const rule of rules) {
+       // Only execute active rules
+       if (rule.startDate > now || (rule.endDate && rule.endDate < now)) {
+         continue;
+       }
+
+       await this.prisma.transaction.create({
+        data: {
+          budgetId,
+          periodId: newPeriodId,
+          amount: rule.amount,
+          date: now,
+          description: `${rule.description} (Period Reset)`,
+          type: TransactionType.RECURRING_RULE,
+          sourceRuleId: rule.id,
+        },
+      });
+
+      await this.prisma.rule.update({
+        where: { id: rule.id },
+        data: { lastExecutedAt: now },
+      });
+    }
   }
 
   async executeRule(rule: Rule): Promise<RuleExecutionResult | null> {
@@ -155,6 +191,10 @@ export class RulesService {
     }
 
     // Check if today is the execution day for this rule
+    if (rule.runOnPeriodReset) {
+      return false; // Handled by rolloverPeriod
+    }
+
     switch (rule.frequency) {
       case PeriodType.DAILY:
         return true; // Execute every day

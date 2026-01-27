@@ -112,6 +112,7 @@ const resources = {
         defaultDescription: 'Recurring funding rule',
         description: 'Description',
         descriptionPlaceholder: 'Rule description',
+        runOnPeriodReset: 'Run this rule when budget period resets',
       },
       transaction: {
         title: 'Transactions',
@@ -273,6 +274,7 @@ const resources = {
         defaultDescription: 'Regra recorrente de financiamento',
         description: 'Descrição',
         descriptionPlaceholder: 'Descrição da regra',
+        runOnPeriodReset: 'Executar esta regra ao reiniciar o período',
       },
       transaction: {
         title: 'Transações',

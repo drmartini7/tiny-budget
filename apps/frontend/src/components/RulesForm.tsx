@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Card, Stack, Text, Group, NumberInput, Select, Button, TextInput } from '@mantine/core';
+import { Card, Stack, Text, Group, NumberInput, Select, Button, TextInput, Checkbox } from '@mantine/core';
 import { MultiSelect } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import type { BudgetWithDetails, CreateRuleDto, PeriodType, Rule, UpdateRuleDto } from '@fun-budget/domain';
@@ -25,6 +25,7 @@ export function RulesForm({ budgets, onSubmit, onCancel, initialData }: RulesFor
       amount: initialData?.amount || 0,
       frequency: (initialData?.frequency as string) || 'MONTHLY',
       executionDay: initialData?.executionDay || 1,
+      runOnPeriodReset: initialData?.runOnPeriodReset || false,
       description: initialData?.description || '',
       startDate: initialData?.startDate ? new Date(initialData.startDate) : new Date(),
     },
@@ -33,7 +34,7 @@ export function RulesForm({ budgets, onSubmit, onCancel, initialData }: RulesFor
       amount: (value) => (value > 0 ? null : t('validation.amountPositive')),
       frequency: (value) => (value ? null : t('validation.required')),
       executionDay: (value, values) =>
-        values.frequency === 'MONTHLY' && (value < 1 || value > 31) ? t('validation.required') : null,
+        !values.runOnPeriodReset && values.frequency === 'MONTHLY' && (value < 1 || value > 31) ? t('validation.required') : null,
     },
   });
 
@@ -43,7 +44,8 @@ export function RulesForm({ budgets, onSubmit, onCancel, initialData }: RulesFor
         budgetIds: [initialData.budgetId],
         amount: initialData.amount,
         frequency: initialData.frequency as string,
-        executionDay: initialData.executionDay,
+        executionDay: initialData.executionDay || 1,
+        runOnPeriodReset: initialData.runOnPeriodReset,
         description: initialData.description,
         startDate: new Date(initialData.startDate),
       });
@@ -63,10 +65,10 @@ export function RulesForm({ budgets, onSubmit, onCancel, initialData }: RulesFor
       const updateData: UpdateRuleDto = {
         amount: values.amount,
         frequency: values.frequency as unknown as PeriodType,
-        executionDay: values.frequency === 'MONTHLY' ? values.executionDay : 1,
+        executionDay: values.runOnPeriodReset ? undefined : (values.frequency === 'MONTHLY' ? values.executionDay : 1),
+        runOnPeriodReset: values.runOnPeriodReset,
         startDate: values.startDate,
         description: values.description || t('rules.defaultDescription'),
-        // We generally don't move rules between budgets on edit, but if needed, we'd update budgetId
         budgetId: values.budgetIds[0],
       };
       await updateRule.mutateAsync({ id: initialData.id, data: updateData });
@@ -75,7 +77,8 @@ export function RulesForm({ budgets, onSubmit, onCancel, initialData }: RulesFor
         budgetId: id,
         amount: values.amount,
         frequency: values.frequency as unknown as PeriodType,
-        executionDay: values.frequency === 'MONTHLY' ? values.executionDay : 1,
+        executionDay: values.runOnPeriodReset ? undefined : (values.frequency === 'MONTHLY' ? values.executionDay : 1),
+        runOnPeriodReset: values.runOnPeriodReset,
         startDate: values.startDate,
         description: values.description || t('rules.defaultDescription'),
       }));
@@ -99,7 +102,7 @@ export function RulesForm({ budgets, onSubmit, onCancel, initialData }: RulesFor
               data={budgetOptions}
               value={form.values.budgetIds[0]}
               onChange={(val) => form.setFieldValue('budgetIds', val ? [val] : [])}
-              disabled // Prevent moving rules between budgets for simplicity unless desired
+              disabled 
             />
           ) : (
             <MultiSelect
@@ -129,12 +132,19 @@ export function RulesForm({ budgets, onSubmit, onCancel, initialData }: RulesFor
             data={frequencyOptions}
             {...form.getInputProps('frequency')}
           />
+          
+          <Checkbox
+            label={t('rules.runOnPeriodReset')}
+            {...form.getInputProps('runOnPeriodReset', { type: 'checkbox' })}
+          />
+
           {form.values.frequency === 'MONTHLY' && (
             <NumberInput
               label={t('rules.executionDay')}
               placeholder={t('rules.executionDayPlaceholder')}
               min={1}
               max={31}
+              disabled={form.values.runOnPeriodReset}
               {...form.getInputProps('executionDay')}
             />
           )}
