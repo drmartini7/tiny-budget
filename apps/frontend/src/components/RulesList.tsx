@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Card, Stack, Text, Select, Group, Button, Badge } from '@mantine/core';
+import { Card, Stack, Text, Select, Group, Button, Badge, ActionIcon, Modal, Tooltip } from '@mantine/core';
+import { IconEdit, IconTrash } from '@tabler/icons-react';
 import type { BudgetWithDetails, Rule } from '@fun-budget/domain';
-import { useRules } from '../hooks/useRules';
+import { useRules, useDeleteRule } from '../hooks/useRules';
 import { useExecuteRules } from '../hooks/useBudgets';
 import { useTranslation } from 'react-i18next';
+import { RulesForm } from './RulesForm';
 
 interface RulesListProps {
   budgets: BudgetWithDetails[];
@@ -13,8 +15,11 @@ export function RulesList({ budgets }: RulesListProps) {
   const { t } = useTranslation();
   const [selectedBudgetId, setSelectedBudgetId] = useState<string>('');
   const [showDisabled, setShowDisabled] = useState<boolean>(false);
+  const [editingRule, setEditingRule] = useState<Rule | null>(null);
+  
   const { data: rules = [], refetch } = useRules(selectedBudgetId, showDisabled);
   const executeRules = useExecuteRules();
+  const deleteRule = useDeleteRule();
 
   const budgetOptions = budgets.map((b) => ({ value: b.id, label: b.name }));
 
@@ -24,8 +29,34 @@ export function RulesList({ budgets }: RulesListProps) {
     refetch();
   };
 
+  const handleDelete = async (id: string) => {
+    if (window.confirm(t('common.confirmDelete'))) {
+      await deleteRule.mutateAsync(id);
+      refetch();
+    }
+  };
+
   return (
     <Stack gap="md">
+      <Modal
+        opened={!!editingRule}
+        onClose={() => setEditingRule(null)}
+        title={t('rules.editTitle')}
+        size="lg"
+      >
+        {editingRule && (
+          <RulesForm
+            budgets={budgets}
+            onSubmit={() => {
+              setEditingRule(null);
+              refetch();
+            }}
+            onCancel={() => setEditingRule(null)}
+            initialData={editingRule}
+          />
+        )}
+      </Modal>
+
       <Select
         label={t('rules.selectBudgetToView')}
         placeholder={t('rules.selectBudgets')}
@@ -69,6 +100,18 @@ export function RulesList({ budgets }: RulesListProps) {
                       </Text>
                     </Stack>
                     <Stack gap={0} align="end">
+                      <Group gap="xs" mb={4}>
+                        <Tooltip label={t('common.edit')}>
+                          <ActionIcon variant="subtle" size="sm" onClick={() => setEditingRule(rule)}>
+                            <IconEdit size={16} />
+                          </ActionIcon>
+                        </Tooltip>
+                        <Tooltip label={t('common.delete')}>
+                          <ActionIcon variant="subtle" color="red" size="sm" onClick={() => handleDelete(rule.id)}>
+                            <IconTrash size={16} />
+                          </ActionIcon>
+                        </Tooltip>
+                      </Group>
                       <Badge variant="light">
                         {t(`period.${String(rule.frequency).toLowerCase()}`)}
                       </Badge>

@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Query, Put } from '@nestjs/common';
 import { RulesService } from './rules.service';
-import { CreateRuleDto, Rule } from '@fun-budget/domain';
+import { CreateRuleDto, Rule, UpdateRuleDto } from '@fun-budget/domain';
 
 @Controller('rules')
 export class RulesController {
@@ -11,7 +11,12 @@ export class RulesController {
     return this.rulesService.createRule(data);
   }
 
-  @Get()
+  @Put(':id')
+  async updateRule(@Param('id') id: string, @Body() data: UpdateRuleDto): Promise<Rule> {
+    return this.rulesService.updateRule(id, data);
+  }
+
+  @Get('budget/:budgetId')@Get()
   async getAllRules(@Query('includeDisabled') includeDisabled?: string): Promise<Rule[]> {
     return this.rulesService.getAllRules(includeDisabled === 'true');
   }

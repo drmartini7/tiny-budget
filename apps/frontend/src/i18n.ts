@@ -95,6 +95,7 @@ const resources = {
       },
       rules: {
         title: 'Funding Rules',
+        editTitle: 'Edit Rule',
         budgets: 'Budgets',
         selectBudgets: 'Select budgets',
         selectBudgetToView: 'Select a budget to view its rules',
@@ -109,6 +110,8 @@ const resources = {
         noRules: 'No rules found for this budget',
         showDisabled: 'Show rules for disabled budgets',
         defaultDescription: 'Recurring funding rule',
+        description: 'Description',
+        descriptionPlaceholder: 'Rule description',
       },
       transaction: {
         title: 'Transactions',
@@ -253,6 +256,7 @@ const resources = {
       },
       rules: {
         title: 'Regras de Financiamento',
+        editTitle: 'Editar Regra',
         budgets: 'Orçamentos',
         selectBudgets: 'Selecione os orçamentos',
         selectBudgetToView: 'Selecione um orçamento para ver suas regras',
@@ -267,6 +271,8 @@ const resources = {
         noRules: 'Nenhuma regra encontrada para este orçamento',
         showDisabled: 'Mostrar regras de orçamentos desativados',
         defaultDescription: 'Regra recorrente de financiamento',
+        description: 'Descrição',
+        descriptionPlaceholder: 'Descrição da regra',
       },
       transaction: {
         title: 'Transações',

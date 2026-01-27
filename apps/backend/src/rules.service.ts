@@ -3,6 +3,7 @@ import { PrismaService } from './prisma.service';
 import { 
   Rule, 
   CreateRuleDto, 
+  UpdateRuleDto,
   TransactionType, 
   PeriodType,
   RuleExecutionResult
@@ -32,6 +33,18 @@ export class RulesService {
       data: {
         ...data,
         startDate: new Date(data.startDate),
+        endDate: data.endDate ? new Date(data.endDate) : undefined,
+      },
+    });
+    return this.toDomainRule(rule);
+  }
+
+  async updateRule(id: string, data: UpdateRuleDto): Promise<Rule> {
+    const rule = await this.prisma.rule.update({
+      where: { id },
+      data: {
+        ...data,
+        startDate: data.startDate ? new Date(data.startDate) : undefined,
         endDate: data.endDate ? new Date(data.endDate) : undefined,
       },
     });

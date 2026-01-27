@@ -125,6 +125,9 @@ export type CreatePersonDto = z.infer<typeof CreatePersonSchema>;
 export const CreateRuleSchema = RuleSchema.omit({ id: true, lastExecutedAt: true });
 export type CreateRuleDto = z.infer<typeof CreateRuleSchema>;
 
+export const UpdateRuleSchema = RuleSchema.omit({ id: true, lastExecutedAt: true }).partial();
+export type UpdateRuleDto = z.infer<typeof UpdateRuleSchema>;
+
 // Utility types for API responses
 export interface BudgetWithDetails extends Budget {
   owner: Person;
