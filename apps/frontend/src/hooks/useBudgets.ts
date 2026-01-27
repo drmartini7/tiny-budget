@@ -103,7 +103,7 @@ export function useCreateTransaction() {
   
   return useMutation({
     mutationFn: createTransaction,
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budgets'] });
       // Invalidate all transaction queries to be safe, or specific one
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
@@ -116,7 +116,7 @@ export function useDeleteTransaction() {
   
   return useMutation({
     mutationFn: deleteTransaction,
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budgets'] });
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
     },
@@ -128,7 +128,7 @@ export function useExecuteRules() {
   
   return useMutation({
     mutationFn: executeRules,
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budgets'] });
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
     },
