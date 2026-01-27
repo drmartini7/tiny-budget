@@ -80,12 +80,12 @@ model Rule {
   budgetId     String
   amount       Float
   frequency    String    // DAILY | MONTHLY | YEARLY
-  executionDay Int
+  executionDay Int?
+  runOnPeriodReset Boolean @default(false)
   startDate    DateTime
   endDate      DateTime?
   description  String
   lastExecutedAt DateTime?
 
-  @@unique([budgetId, frequency, executionDay, startDate])
   @@index([budgetId])
 }

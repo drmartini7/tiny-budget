@@ -16,9 +16,14 @@ import {
 } from '@fun-budget/domain';
 import { startOfDay, endOfDay, startOfMonth, endOfMonth, startOfYear, endOfYear, isWithinInterval, addMonths } from 'date-fns';
 
+import { RulesService } from './rules.service';
+
 @Injectable()
 export class BudgetService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private rulesService: RulesService // Inject RulesService
+  ) {}
 
   private toDomainBudget(b: any): Budget {
     return {
@@ -519,5 +524,8 @@ export class BudgetService {
         },
       });
     }
+    
+    // Execute rules that should run on reset
+    await this.rulesService.executeRulesOnPeriodReset(budgetId, newPeriod.id);
   }
 }

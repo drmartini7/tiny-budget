@@ -86,7 +86,8 @@ export const RuleSchema = z.object({
   budgetId: z.string().uuid(),
   amount: z.number().positive(), // Always adds money? Or can we have recurring expenses? Assuming income for now based on "adding money"
   frequency: PeriodTypeSchema,
-  executionDay: z.number().min(1).max(31), // e.g., 5th of the month
+  executionDay: z.number().min(1).max(31).optional(), // Optional if runOnPeriodReset is true
+  runOnPeriodReset: z.boolean().default(false),
   startDate: z.date(),
   endDate: z.date().optional(),
   description: z.string(),
