@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Card, Group, Text, Stack, Select, Badge, ScrollArea, ActionIcon } from '@mantine/core';
+import { Card, Group, Text, Stack, Badge, ScrollArea, ActionIcon, Loader, Center } from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 import type { BudgetWithDetails } from '@fun-budget/domain';
 import { useTranslation } from 'react-i18next';
 import { useTransactions } from '../hooks/useTransactions';
 import { useDeleteTransaction } from '../hooks/useBudgets';
+import { TransactionFilters, TransactionFiltersState } from './TransactionFilters';
 
 interface TransactionListProps {
   budgets: BudgetWithDetails[];
@@ -12,15 +13,38 @@ interface TransactionListProps {
 
 export function TransactionList({ budgets }: TransactionListProps) {
   const { t } = useTranslation();
-  const [selectedBudgetId, setSelectedBudgetId] = useState<string>('');
   
-  const { data: transactions = [] } = useTransactions(selectedBudgetId);
+  const [filters, setFilters] = useState<TransactionFiltersState>({
+    budgetId: '',
+    startDate: null,
+    endDate: null,
+    search: '',
+    pastOnly: false,
+  });
+  
+  const { data: transactions = [], isPending } = useTransactions(filters.budgetId, {
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    search: filters.search,
+    pastOnly: filters.pastOnly,
+  });
+  
   const deleteTransaction = useDeleteTransaction();
 
   const budgetOptions = budgets.map(budget => ({
     value: budget.id,
     label: budget.name,
   }));
+
+  const handleClearFilters = () => {
+    setFilters({
+      budgetId: filters.budgetId, // Keep budget selected
+      startDate: null,
+      endDate: null,
+      search: '',
+      pastOnly: false,
+    });
+  };
 
   const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat('en-US', {
@@ -39,29 +63,34 @@ export function TransactionList({ budgets }: TransactionListProps) {
 
   return (
     <Stack gap="md">
-      <Select
-        label={t('transaction.selectBudget')}
-        placeholder={t('transaction.selectBudgetPlaceholder')}
-        data={budgetOptions}
-        value={selectedBudgetId}
-        onChange={(value) => setSelectedBudgetId(value || '')}
-        clearable
+      <TransactionFilters
+        budgets={budgetOptions}
+        filters={filters}
+        onChange={setFilters}
+        onClear={handleClearFilters}
       />
 
-      {selectedBudgetId && (
+      {filters.budgetId && (
         <Card withBorder>
           <Stack gap="sm">
-            <Text size="lg" fw={500}>{t('transaction.recentTransactions')}</Text>
+            <Group justify="space-between">
+                <Text size="lg" fw={500}>{t('transaction.recentTransactions')}</Text>
+                <Badge variant="light" color="gray">{transactions.length}</Badge>
+            </Group>
             
-            {transactions.length === 0 ? (
-              <Text c="dimmed" ta="center">
+            {isPending ? (
+                 <Center p="xl">
+                    <Loader />
+                 </Center>
+            ) : transactions.length === 0 ? (
+              <Text c="dimmed" ta="center" py="xl">
                 {t('transaction.noTransactions')}
               </Text>
             ) : (
-              <ScrollArea h={400}>
+              <ScrollArea h={500}>
                 <Stack gap="sm">
                   {transactions.map((transaction) => {
-                    const selectedBudget = budgets.find(b => b.id === selectedBudgetId);
+                    const selectedBudget = budgets.find(b => b.id === filters.budgetId);
                     
                     return (
                       <Card key={transaction.id} withBorder p="sm">
@@ -89,7 +118,7 @@ export function TransactionList({ budgets }: TransactionListProps) {
                               <ActionIcon 
                                 color="red" 
                                 variant="subtle" 
-                                onClick={() => deleteTransaction.mutate({ budgetId: selectedBudgetId, transactionId: transaction.id })}
+                                onClick={() => deleteTransaction.mutate({ budgetId: filters.budgetId, transactionId: transaction.id })}
                                 loading={deleteTransaction.isPending}
                               >
                                 <IconTrash size={16} />

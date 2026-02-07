@@ -76,8 +76,19 @@ export class BudgetController {
   }
 
   @Get(':id/transactions')
-  async getTransactions(@Param('id') budgetId: string): Promise<Transaction[]> {
-    return this.budgetService.getTransactions(budgetId);
+  async getTransactions(
+    @Param('id') budgetId: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('search') search?: string,
+    @Query('pastOnly') pastOnly?: string,
+  ): Promise<Transaction[]> {
+    return this.budgetService.getTransactions(budgetId, {
+      startDate: startDate ? new Date(startDate) : undefined,
+      endDate: endDate ? new Date(endDate) : undefined,
+      search,
+      pastOnly: pastOnly === 'true',
+    });
   }
 
   @Post(':id/execute-rules')

@@ -342,9 +342,46 @@ export class BudgetService {
     });
   }
 
-  async getTransactions(budgetId: string, limit = 50): Promise<Transaction[]> {
+  async getTransactions(
+    budgetId: string, 
+    options: { 
+      startDate?: Date; 
+      endDate?: Date; 
+      search?: string; 
+      pastOnly?: boolean; 
+      limit?: number;
+    } = {}
+  ): Promise<Transaction[]> {
+    const { startDate, endDate, search, pastOnly, limit = 100 } = options;
+    const where: any = { budgetId };
+
+    if (startDate || endDate || pastOnly) {
+      where.date = {};
+      if (startDate) {
+        where.date.gte = startDate;
+      }
+      
+      let end = endDate;
+      if (pastOnly) {
+        const now = new Date();
+        if (!end || end > now) {
+          end = now;
+        }
+      }
+
+      if (end) {
+        where.date.lte = end;
+      }
+    }
+
+    if (search) {
+      where.description = {
+        contains: search,
+      };
+    }
+
     const list = await this.prisma.transaction.findMany({
-      where: { budgetId },
+      where,
       orderBy: { date: 'desc' },
       take: limit,
     });
