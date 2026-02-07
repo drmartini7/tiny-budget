@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Transaction } from '@fun-budget/domain';
+import { TransactionWithDetails } from '@fun-budget/domain';
 
 const API_BASE = '/api';
 
@@ -10,7 +10,7 @@ export interface TransactionFilters {
   pastOnly?: boolean;
 }
 
-async function fetchTransactions(budgetId: string, filters?: TransactionFilters): Promise<Transaction[]> {
+async function fetchTransactions(budgetId: string, filters?: TransactionFilters): Promise<TransactionWithDetails[]> {
   const params = new URLSearchParams();
   if (filters?.startDate) params.append('startDate', filters.startDate.toISOString());
   if (filters?.endDate) params.append('endDate', filters.endDate.toISOString());

@@ -11,6 +11,7 @@ const resources = {
       tabs: {
         budgets: 'Budgets',
         people: 'People',
+        payees: 'Payees',
         transactions: 'Transactions',
         rules: 'Rules',
       },
@@ -74,6 +75,15 @@ const resources = {
         email: 'Email',
         emailPlaceholder: 'Enter email (optional)',
         noPeople: 'No people found. Add people to manage budgets!',
+      },
+      payee: {
+        title: 'Payees',
+        createNew: 'Create New Payee',
+        edit: 'Edit Payee',
+        name: 'Name',
+        namePlaceholder: 'Enter payee name',
+        searchPlaceholder: 'Search payees...',
+        noPayees: 'No payees found. Create one or add during transaction!',
       },
       expense: {
         quickAdd: 'Quick Add Expense',
@@ -182,6 +192,7 @@ const resources = {
       tabs: {
         budgets: 'Orçamentos',
         people: 'Pessoas',
+        payees: 'Beneficiários',
         transactions: 'Transações',
         rules: 'Regras',
       },
@@ -245,6 +256,15 @@ const resources = {
         email: 'Email',
         emailPlaceholder: 'Digite o email (opcional)',
         noPeople: 'Nenhuma pessoa encontrada. Adicione pessoas para gerenciar orçamentos!',
+      },
+      payee: {
+        title: 'Beneficiários',
+        createNew: 'Criar Novo Beneficiário',
+        edit: 'Editar Beneficiário',
+        name: 'Nome',
+        namePlaceholder: 'Digite o nome do beneficiário',
+        searchPlaceholder: 'Buscar beneficiários...',
+        noPayees: 'Nenhum beneficiário encontrado. Crie um ou adicione durante a transação!',
       },
       expense: {
         quickAdd: 'Adicionar Despesa Rápido',

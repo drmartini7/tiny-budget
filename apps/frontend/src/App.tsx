@@ -25,6 +25,8 @@ interface AppContentProps {
   setPrimaryColor: (color: string) => void;
 }
 
+import { PayeeList } from './components/PayeeList';
+
 function AppContent({ primaryColor, setPrimaryColor }: AppContentProps) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<string>('budgets');
@@ -79,6 +81,7 @@ function AppContent({ primaryColor, setPrimaryColor }: AppContentProps) {
         <Tabs.List>
           <Tabs.Tab value="budgets">{t('tabs.budgets')}</Tabs.Tab>
           <Tabs.Tab value="people">{t('tabs.people')}</Tabs.Tab>
+          <Tabs.Tab value="payees">{t('tabs.payees')}</Tabs.Tab>
           <Tabs.Tab value="transactions">{t('tabs.transactions')}</Tabs.Tab>
           <Tabs.Tab value="rules">{t('tabs.rules')}</Tabs.Tab>
         </Tabs.List>
@@ -127,6 +130,13 @@ function AppContent({ primaryColor, setPrimaryColor }: AppContentProps) {
             )}
             
             <PersonList people={people} />
+          </Container>
+        </Tabs.Panel>
+
+        <Tabs.Panel value="payees">
+          <Container py="md">
+            <Text size="lg" fw={500} mb="md">{t('payee.title')}</Text>
+            <PayeeList />
           </Container>
         </Tabs.Panel>
 

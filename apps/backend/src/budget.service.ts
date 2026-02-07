@@ -17,12 +17,14 @@ import {
 import { startOfDay, endOfDay, startOfMonth, endOfMonth, startOfYear, endOfYear, isWithinInterval, addMonths } from 'date-fns';
 
 import { RulesService } from './rules.service';
+import { PayeesService } from './payees.service';
 
 @Injectable()
 export class BudgetService {
   constructor(
     private prisma: PrismaService,
-    private rulesService: RulesService // Inject RulesService
+    private rulesService: RulesService,
+    private payeesService: PayeesService
   ) {}
 
   private toDomainBudget(b: any): Budget {
@@ -60,6 +62,7 @@ export class BudgetService {
       date: t.date,
       description: t.description,
       merchant: t.merchant ?? undefined,
+      payeeId: t.payeeId ?? undefined,
       type: t.type as any,
       sourceRuleId: t.sourceRuleId ?? undefined,
       createdAt: t.createdAt,
@@ -280,6 +283,13 @@ export class BudgetService {
     // Get current period for this budget
     const currentPeriod = await this.getCurrentPeriod(data.budgetId);
     
+    // Handle Payee
+    let payeeId = undefined;
+    if (data.payeeName) {
+      const payee = await this.payeesService.findOrCreatePayee(data.payeeName);
+      payeeId = payee.id;
+    }
+
     if (data.installments && data.installments > 1) {
       const amountPerInstallment = data.amount / data.installments;
       const transactions = [];
@@ -294,8 +304,6 @@ export class BudgetService {
           periodId = currentPeriod.id;
         }
 
-        // We can't batch create easily with different data unless we use createMany which doesn't return created items easily in all DBs or just loop.
-        // Prisma $transaction allows sequential creates.
         transactions.push(
           this.prisma.transaction.create({
             data: {
@@ -305,7 +313,8 @@ export class BudgetService {
               date,
               description: `${data.description} (${i + 1}/${data.installments})`,
               type: data.type,
-              merchant: data.merchant,
+              merchant: data.merchant, // Kept for backward compat or if passed explicitly
+              payeeId,
             },
           })
         );
@@ -316,13 +325,14 @@ export class BudgetService {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { installments, ...transactionData } = data;
+    const { installments, payeeName, ...transactionData } = data;
 
     const t = await this.prisma.transaction.create({
       data: {
         ...transactionData,
         periodId: currentPeriod?.id,
         date: new Date(data.date),
+        payeeId,
       },
     });
     return this.toDomainTransaction(t);
@@ -384,8 +394,14 @@ export class BudgetService {
       where,
       orderBy: { date: 'desc' },
       take: limit,
+      include: {
+        payee: true,
+      },
     });
-    return list.map((t) => this.toDomainTransaction(t));
+    return list.map((t) => ({
+      ...this.toDomainTransaction(t),
+      payee: t.payee ? this.payeesService.toDomainPayee(t.payee) : undefined,
+    }));
   }
 
   async calculateCurrentBalance(budgetId: string): Promise<number> {

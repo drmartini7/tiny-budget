@@ -97,9 +97,9 @@ export function TransactionList({ budgets }: TransactionListProps) {
                         <Group justify="apart">
                           <Stack gap={0}>
                             <Text fw={500}>{transaction.description}</Text>
-                            {transaction.merchant && (
+                            {(transaction.payee || transaction.merchant) && (
                               <Text size="sm" c="dimmed">
-                                {transaction.merchant}
+                                {transaction.payee?.name || transaction.merchant}
                               </Text>
                             )}
                             <Text size="xs" c="dimmed">

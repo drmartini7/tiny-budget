@@ -5,9 +5,11 @@ import { PrismaService } from './prisma.service';
 import { BudgetService } from './budget.service';
 import { RulesService } from './rules.service';
 import { PersonService } from './person.service';
+import { PayeesService } from './payees.service';
 import { BudgetController } from './budget.controller';
 import { RulesController } from './rules.controller';
 import { PersonController } from './person.controller';
+import { PayeesController } from './payees.controller';
 
 @Module({
   imports: [],
@@ -15,14 +17,16 @@ import { PersonController } from './person.controller';
     AppController, 
     BudgetController, 
     RulesController, 
-    PersonController
+    PersonController,
+    PayeesController
   ],
   providers: [
     AppService, 
     PrismaService, 
     BudgetService, 
     RulesService, 
-    PersonService
+    PersonService,
+    PayeesService
   ],
 })
 export class AppModule {}
