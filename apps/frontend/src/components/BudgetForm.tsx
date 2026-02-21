@@ -58,6 +58,7 @@ export function BudgetForm({ people, onSubmit, onCancel, initialData }: BudgetFo
           periodType: values.periodType as unknown as PeriodType,
           overflowPolicy: values.overflowPolicy as unknown as OverflowPolicy,
           overflowLimit: values.overflowPolicy === 'LIMITED' ? values.overflowLimit : undefined,
+          startDate: values.startDate,
           enabled: initialData.enabled, // Preserve existing enabled state or add field to form
         };
         await updateBudget.mutateAsync({ id: initialData.id, data: updateData });

@@ -19,6 +19,24 @@ model Person {
   @@index([email])
 }
 
+model Payee {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  transactions Transaction[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                   String   @id @default(uuid())
+  name                 String
+  type                 String   // BANK | CREDIT_CARD
+  financialInstitution String
+  active               Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
 model Budget {
   id             String         @id @default(uuid())
   name           String
@@ -64,7 +82,9 @@ model Transaction {
   amount       Float
   date         DateTime
   description  String
-  merchant     String?
+  merchant     String? // Deprecated
+  payee        Payee?   @relation(fields: [payeeId], references: [id])
+  payeeId      String?
   type         String   // EXPENSE | INCOME | CARRYOVER | RECURRING_RULE
   sourceRuleId String?
   createdAt    DateTime @default(now())
@@ -72,6 +92,7 @@ model Transaction {
   @@index([budgetId, date])
   @@index([periodId])
   @@index([sourceRuleId])
+  @@index([payeeId])
 }
 
 model Rule {

@@ -8,7 +8,8 @@ import {
   Stack, 
   Group,
   ActionIcon,
-  Tooltip
+  Tooltip,
+  Autocomplete
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
@@ -16,6 +17,7 @@ import { IconPlus, IconCurrencyDollar } from '@tabler/icons-react';
 import type { Budget, CreateTransactionDto, TransactionType } from '@fun-budget/domain';
 import { useTranslation } from 'react-i18next';
 import { useCreateTransaction } from '../hooks/useBudgets';
+import { usePayees } from '../hooks/usePayees';
 
 interface QuickAddExpenseProps {
   budgets: Budget[];
@@ -27,6 +29,10 @@ export function QuickAddExpense({ budgets, onExpenseAdded }: QuickAddExpenseProp
   const [opened, setOpened] = useState(false);
   const createTransaction = useCreateTransaction();
   const budgetSelectRef = useRef<HTMLInputElement>(null);
+  
+  // Payee state
+  const [payeeSearch, setPayeeSearch] = useState('');
+  const { data: payees = [] } = usePayees(payeeSearch);
 
   useEffect(() => {
     if (opened) {
@@ -41,7 +47,7 @@ export function QuickAddExpense({ budgets, onExpenseAdded }: QuickAddExpenseProp
       budgetId: budgets.length > 0 ? budgets[0].id : '',
       amount: 0,
       description: '',
-      merchant: '',
+      payeeName: '',
       date: new Date(),
       installments: 1,
     },
@@ -56,14 +62,19 @@ export function QuickAddExpense({ budgets, onExpenseAdded }: QuickAddExpenseProp
   const handleSubmit = async (values: typeof form.values) => {
     try {
       const transactionData: CreateTransactionDto = {
-        ...values,
-        type: 'EXPENSE' as unknown as TransactionType,
+        budgetId: values.budgetId,
         amount: -Math.abs(values.amount), // Make negative for expense
+        date: values.date,
+        description: values.description,
+        payeeName: values.payeeName,
+        type: 'EXPENSE' as unknown as TransactionType,
+        installments: values.installments > 1 ? values.installments : undefined,
       };
       
       await createTransaction.mutateAsync(transactionData);
       setOpened(false);
       form.reset();
+      setPayeeSearch('');
       onExpenseAdded();
     } catch (error) {
       console.error('Failed to create expense:', error);
@@ -74,6 +85,8 @@ export function QuickAddExpense({ budgets, onExpenseAdded }: QuickAddExpenseProp
     value: budget.id,
     label: budget.name,
   }));
+  
+  const payeeOptions = payees.map(p => p.name);
 
   return (
     <>
@@ -123,10 +136,15 @@ export function QuickAddExpense({ budgets, onExpenseAdded }: QuickAddExpenseProp
               {...form.getInputProps('description')}
             />
             
-            <TextInput
-              label={t('expense.merchant')}
+            <Autocomplete
+              label={t('expense.merchant')} // Reusing merchant label for now
               placeholder={t('expense.merchantPlaceholder')}
-              {...form.getInputProps('merchant')}
+              data={payeeOptions}
+              value={form.values.payeeName}
+              onChange={(value) => {
+                form.setFieldValue('payeeName', value);
+                setPayeeSearch(value);
+              }}
             />
             
             <Group justify="flex-end">
