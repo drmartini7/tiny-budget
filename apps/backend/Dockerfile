@@ -46,6 +46,9 @@ COPY --from=builder /app/apps/backend/prisma ./prisma
 # Create data directory
 RUN mkdir -p /app/data
 
+# Define volume for persistent data
+VOLUME ["/app/data"]
+
 # Expose port
 EXPOSE 3000
 
