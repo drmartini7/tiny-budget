@@ -11,7 +11,7 @@ export function PayeeList() {
   const [editingPayee, setEditingPayee] = useState<Payee | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   
-  const { data: payees = [], isLoading } = usePayees(search);
+  const { data: payees = [] } = usePayees(search);
   const createPayee = useCreatePayee();
   const updatePayee = useUpdatePayee();
   const deletePayee = useDeletePayee();

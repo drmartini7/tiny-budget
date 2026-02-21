@@ -27,6 +27,16 @@ model Payee {
   updatedAt DateTime @updatedAt
 }
 
+model Account {
+  id                   String   @id @default(uuid())
+  name                 String
+  type                 String   // BANK | CREDIT_CARD
+  financialInstitution String
+  active               Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
 model Budget {
   id             String         @id @default(uuid())
   name           String

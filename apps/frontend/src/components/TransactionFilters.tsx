@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Card, Grid, TextInput, Checkbox, Button, Group, Select, Collapse, ActionIcon, Box } from '@mantine/core';
+import { Card, Grid, TextInput, Checkbox, Button, Group, Select, Collapse } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
-import { IconSearch, IconFilter, IconX } from '@tabler/icons-react';
+import { IconSearch, IconFilter } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useDebouncedValue } from '@mantine/hooks';
 

@@ -11,6 +11,7 @@ const resources = {
       tabs: {
         budgets: 'Budgets',
         people: 'People',
+        accounts: 'Accounts',
         payees: 'Payees',
         transactions: 'Transactions',
         rules: 'Rules',
@@ -61,6 +62,12 @@ const resources = {
         noBudgets: 'No budgets found. Create your first budget!',
         transferFunds: 'Transfer Funds',
         selectBudget: 'Select budget',
+        rollover: {
+          title: 'Rollover Budget Period',
+          confirm: 'Are you sure you want to rollover the period for {{name}}?',
+          description: 'This will close the current period, calculate carryover according to your policy, and execute any rules set to run on reset.',
+          action: 'Rollover',
+        },
         status: {
           available: 'Available',
           empty: 'Empty',
@@ -75,6 +82,25 @@ const resources = {
         email: 'Email',
         emailPlaceholder: 'Enter email (optional)',
         noPeople: 'No people found. Add people to manage budgets!',
+      },
+      account: {
+        title: 'Accounts',
+        createNew: 'Create New Account',
+        listTitle: 'Account List',
+        name: 'Name',
+        namePlaceholder: 'Enter account name',
+        type: 'Type',
+        typePlaceholder: 'Select account type',
+        institution: 'Financial Institution',
+        institutionPlaceholder: 'Enter financial institution',
+        active: 'Active',
+        inactive: 'Inactive',
+        status: 'Status',
+        noAccounts: 'No accounts found. Create your first account!',
+        types: {
+          bank: 'Bank',
+          creditCard: 'Credit Card',
+        },
       },
       payee: {
         title: 'Payees',
@@ -192,6 +218,7 @@ const resources = {
       tabs: {
         budgets: 'Orçamentos',
         people: 'Pessoas',
+        accounts: 'Contas',
         payees: 'Beneficiários',
         transactions: 'Transações',
         rules: 'Regras',
@@ -242,6 +269,12 @@ const resources = {
         noBudgets: 'Nenhum orçamento encontrado. Crie seu primeiro orçamento!',
         transferFunds: 'Transferir Fundos',
         selectBudget: 'Selecione o orçamento',
+        rollover: {
+          title: 'Reiniciar Período do Orçamento',
+          confirm: 'Tem certeza que deseja reiniciar o período para {{name}}?',
+          description: 'Isso fechará o período atual, calculará o transbordo de acordo com sua política e executará quaisquer regras definidas para executar ao reiniciar.',
+          action: 'Reiniciar',
+        },
         status: {
           available: 'Disponível',
           empty: 'Vazio',
@@ -256,6 +289,25 @@ const resources = {
         email: 'Email',
         emailPlaceholder: 'Digite o email (opcional)',
         noPeople: 'Nenhuma pessoa encontrada. Adicione pessoas para gerenciar orçamentos!',
+      },
+      account: {
+        title: 'Contas',
+        createNew: 'Criar Nova Conta',
+        listTitle: 'Lista de Contas',
+        name: 'Nome',
+        namePlaceholder: 'Digite o nome da conta',
+        type: 'Tipo',
+        typePlaceholder: 'Selecione o tipo de conta',
+        institution: 'Instituição Financeira',
+        institutionPlaceholder: 'Digite a instituição financeira',
+        active: 'Ativo',
+        inactive: 'Inativo',
+        status: 'Status',
+        noAccounts: 'Nenhuma conta encontrada. Crie sua primeira conta!',
+        types: {
+          bank: 'Banco',
+          creditCard: 'Cartão de Crédito',
+        },
       },
       payee: {
         title: 'Beneficiários',

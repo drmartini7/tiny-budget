@@ -165,3 +165,16 @@ export function useTransferFunds() {
     },
   });
 }
+
+export function useRolloverBudget() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => fetch(`/api/budgets/${id}/rollover`, { method: 'POST' }).then(async res => {
+        if (!res.ok) throw new Error('Failed to rollover budget');
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budgets'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    },
+  });
+}

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Card, Group, Text, Badge, Stack, Grid, Modal, ActionIcon, Tooltip, Switch } from '@mantine/core';
-import { IconEdit, IconArrowsRightLeft } from '@tabler/icons-react';
+import { Card, Group, Text, Badge, Stack, Grid, Modal, ActionIcon, Tooltip, Switch, Button } from '@mantine/core';
+import { IconEdit, IconArrowsRightLeft, IconRotateClockwise } from '@tabler/icons-react';
 import { BudgetWithDetails } from '@fun-budget/domain';
 import { useTranslation } from 'react-i18next';
 import { QuickAddIncome } from './QuickAddIncome';
-import { useSetBudgetEnabled } from '../hooks/useBudgets';
+import { useSetBudgetEnabled, useRolloverBudget } from '../hooks/useBudgets';
 import { BudgetForm } from './BudgetForm';
 import { TransferModal } from './TransferModal';
 
@@ -19,8 +19,10 @@ interface BudgetListProps {
 export function BudgetList({ budgets, selectedBudget, onBudgetSelect, onBudgetUpdated, people = [] }: BudgetListProps) {
   const { t } = useTranslation();
   const setEnabled = useSetBudgetEnabled();
+  const rollover = useRolloverBudget();
   const [editingBudget, setEditingBudget] = useState<BudgetWithDetails | null>(null);
   const [transferSourceBudget, setTransferSourceBudget] = useState<BudgetWithDetails | null>(null);
+  const [rolloverBudget, setRolloverBudget] = useState<BudgetWithDetails | null>(null);
 
   const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat('en-US', {
@@ -58,6 +60,31 @@ export function BudgetList({ budgets, selectedBudget, onBudgetSelect, onBudgetUp
             initialData={editingBudget}
           />
         )}
+      </Modal>
+
+      <Modal
+        opened={!!rolloverBudget}
+        onClose={() => setRolloverBudget(null)}
+        title={t('budget.rollover.title')}
+      >
+        <Text>{t('budget.rollover.confirm', { name: rolloverBudget?.name })}</Text>
+        <Text size="sm" c="dimmed" mt="sm">{t('budget.rollover.description')}</Text>
+        <Group justify="flex-end" mt="md">
+          <Button variant="default" onClick={() => setRolloverBudget(null)}>
+            {t('common.cancel')}
+          </Button>
+          <Button 
+            onClick={() => {
+              if (rolloverBudget) {
+                rollover.mutate(rolloverBudget.id);
+                setRolloverBudget(null);
+              }
+            }}
+            loading={rollover.isPending}
+          >
+            {t('budget.rollover.action')}
+          </Button>
+        </Group>
       </Modal>
 
       <TransferModal
@@ -168,6 +195,17 @@ export function BudgetList({ budgets, selectedBudget, onBudgetSelect, onBudgetUp
                             }}
                           >
                             <IconArrowsRightLeft size={16} />
+                          </ActionIcon>
+                        </Tooltip>
+                        <Tooltip label={t('budget.rollover.title')}>
+                          <ActionIcon 
+                            variant="light"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setRolloverBudget(budget);
+                            }}
+                          >
+                            <IconRotateClockwise size={16} />
                           </ActionIcon>
                         </Tooltip>
                       </Group>

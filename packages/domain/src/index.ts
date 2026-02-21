@@ -48,6 +48,18 @@ export const PayeeSchema = z.object({
 });
 export type Payee = z.infer<typeof PayeeSchema>;
 
+// Account
+export const AccountSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1).max(100),
+  type: z.enum(['BANK', 'CREDIT_CARD']),
+  financialInstitution: z.string().min(1).max(150),
+  active: z.boolean().default(true),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+export type Account = z.infer<typeof AccountSchema>;
+
 // Budget
 export const BudgetSchema = z.object({
   id: z.string().uuid(),
@@ -136,6 +148,9 @@ export type CreatePersonDto = z.infer<typeof CreatePersonSchema>;
 
 export const CreatePayeeSchema = PayeeSchema.omit({ id: true, createdAt: true, updatedAt: true });
 export type CreatePayeeDto = z.infer<typeof CreatePayeeSchema>;
+
+export const CreateAccountSchema = AccountSchema.omit({ id: true, createdAt: true, updatedAt: true });
+export type CreateAccountDto = z.infer<typeof CreateAccountSchema>;
 
 export const UpdatePayeeSchema = PayeeSchema.omit({ id: true, createdAt: true, updatedAt: true }).partial();
 export type UpdatePayeeDto = z.infer<typeof UpdatePayeeSchema>;
