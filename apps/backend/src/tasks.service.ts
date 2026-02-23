@@ -12,7 +12,9 @@ export class TasksService {
     private readonly budgetService: BudgetService,
   ) {}
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, {
+    name: 'daily_rollover',
+  })
   async handleDailyRollover() {
     this.logger.debug('Running daily rollover check...');
 

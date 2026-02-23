@@ -1,4 +1,4 @@
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 # Install system dependencies
 RUN apk add --no-cache openssl libc6-compat
@@ -26,7 +26,7 @@ RUN npx prisma generate --schema=apps/backend/prisma/schema.prisma
 RUN npm run -w @fun-budget/domain build && npm run -w backend build
 
 # Production stage
-FROM node:18-alpine AS production
+FROM node:20-alpine AS production
 
 # Install system dependencies
 RUN apk add --no-cache openssl libc6-compat
